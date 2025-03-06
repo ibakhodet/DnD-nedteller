@@ -34,6 +34,11 @@
     <div class="container" id="theme-container">
         <h1 class="title">🗡️ D&D Session Countdown 🗡️</h1>
         
+        <div class="session-info">
+            <div class="session-label">Neste session:</div>
+            <div class="session-date">25. Mars 2025, 18:00</div>
+        </div>
+        
         <div class="theme-selector">
             <div class="theme-title">Fargetema</div>
             <div class="theme-container">
@@ -44,11 +49,6 @@
                 <button class="theme-button nahiri-theme" onclick="switchTheme('nahiri', this)">🍄 Nahiri</button>
                 <button class="theme-button oli-theme" onclick="switchTheme('oli', this)">🌊 Oli</button>
             </div>
-        </div>
-        
-        <div class="session-info">
-            <div class="session-label">Neste session:</div>
-            <div class="session-date">25. Mars 2025, 18:00</div>
         </div>
         
         <div class="progress-bar">
@@ -81,6 +81,24 @@
                 </div>
                 <div class="countdown-label">sek</div>
             </div>
+        </div>
+        
+        <!-- Ambience Panel -->
+        <div class="ambience-panel">
+            <div class="ambience-title">Ambience</div>
+            <div class="ambience-controls">
+                <button id="toggleAudio" class="audio-button">
+                    <span id="audioIcon">🔇</span>
+                </button>
+                <div class="volume-control">
+                    <span class="volume-icon">🎸</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="30" class="volume-slider">
+                </div>
+            </div>
+            <audio id="dungeonAudio" autoplay loop>
+                <source src="audio/Goodhaven+dungeon.mp3" type="audio/mpeg">
+                Din nettleser støtter ikke lydavspilling.
+            </audio>
         </div>
         
         <div class="fun-fact">

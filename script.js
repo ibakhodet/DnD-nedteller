@@ -64,6 +64,10 @@ const titleElement = document.querySelector('.title');
 const countdownValues = document.querySelectorAll('.countdown-value');
 const factContent = document.getElementById('fact-content');
 const progressBar = document.getElementById('progress-bar');
+const audioElement = document.getElementById('dungeonAudio');
+const toggleButton = document.getElementById('toggleAudio');
+const audioIcon = document.getElementById('audioIcon');
+const volumeSlider = document.getElementById('volumeSlider');
 
 // Session date
 const SESSION_DATE = new Date('2025-03-25T18:00:00');
@@ -82,6 +86,63 @@ function init() {
     
     // Update progress bar
     updateProgressBar();
+    
+    // Setup audio controls
+    setupAudioControls();
+}
+
+// Setup audio controls
+function setupAudioControls() {
+    // Set initial volume (30%)
+    audioElement.volume = 0.3;
+    
+    // Toggle button functionality
+    toggleButton.addEventListener('click', () => {
+        if (audioElement.paused) {
+            audioElement.play().catch(error => {
+                console.log("Audio playback failed: ", error);
+                alert("Kunne ikke spille av lyd. Dette kan være på grunn av nettleserens innstillinger.");
+            });
+            audioIcon.textContent = '🔇';
+            toggleButton.classList.add('playing');
+        } else {
+            audioElement.pause();
+            audioIcon.textContent = '🔊';
+            toggleButton.classList.remove('playing');
+        }
+    });
+    
+    // Volume slider functionality
+    volumeSlider.addEventListener('input', () => {
+        const volume = volumeSlider.value / 100;
+        audioElement.volume = volume;
+        
+        // Change icon based on volume level
+        if (volume === 0) {
+            audioIcon.textContent = '🔈';
+        } else if (volume < 0.5) {
+            audioIcon.textContent = '🔉';
+        } else {
+            audioIcon.textContent = '🔊';
+        }
+        
+        // If the audio is paused and user adjusts volume, play it
+        if (audioElement.paused && volume > 0) {
+            audioElement.play().catch(e => console.log(e));
+            toggleButton.classList.add('playing');
+        }
+    });
+    
+    // Handle autoplay restrictions
+    audioElement.addEventListener('play', () => {
+        audioIcon.textContent = '🔇';
+        toggleButton.classList.add('playing');
+    });
+    
+    audioElement.addEventListener('pause', () => {
+        audioIcon.textContent = '🔊';
+        toggleButton.classList.remove('playing');
+    });
 }
 
 // Function to create bursting dice effect
@@ -171,27 +232,13 @@ function updateProgressBar() {
     progressBar.style.width = `${progressPercentage}%`;
 }
 
-// Start the fact rotation (change every hour)
+// Start the fact rotation (change every 25 seconds)
 function startFactRotation() {
-    // Set initial random fact
+    // Set initial random fact (truly random now)
     showRandomFact();
     
-    // Calculate time until the next hour
-    const now = new Date();
-    const nextHour = new Date(now);
-    nextHour.setHours(nextHour.getHours() + 1);
-    nextHour.setMinutes(0);
-    nextHour.setSeconds(0);
-    nextHour.setMilliseconds(0);
-    
-    const timeUntilNextHour = nextHour - now;
-    
-    // Set timeout to change at the next hour boundary
-    setTimeout(() => {
-        showRandomFact();
-        // Then set interval to change every hour
-        setInterval(showRandomFact, 3600000);
-    }, timeUntilNextHour);
+    // Change fact every 25 seconds
+    setInterval(showRandomFact, 25000);
 }
 
 // Display a random fact from our collection

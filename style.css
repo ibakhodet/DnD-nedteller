@@ -1,9 +1,134 @@
+/* Legg til dette i din style.css fil */
+
+/* Ambience Panel Styles */
+.ambience-panel {
+    background-color: #292524;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    border: 1px solid #44403c;
+}
+
+.ambience-title {
+    text-align: center;
+    color: #fbbf24;
+    font-weight: 600;
+    font-family: 'MedievalSharp', cursive;
+    margin-bottom: 10px;
+}
+
+.ambience-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.audio-button {
+    background-color: #3f3f46;
+    color: #fbbf24;
+    border: 1px solid #57534e;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audio-button:hover {
+    background-color: #52525b;
+}
+
+.audio-button.playing {
+    background-color: #991b1b;
+    border-color: #b91c1c;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    max-width: 200px;
+}
+
+.volume-icon {
+    font-size: 18px;
+    color: #fbbf24;
+}
+
+.volume-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #57534e;
+    border-radius: 3px;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #fbbf24;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #fbbf24;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: #fcd34d;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    background: #fcd34d;
+}
+
+/* Moved Theme Selector (add these to your existing CSS) */
+.theme-selector {
+    margin: 20px 0;
+}
+
+.theme-title {
+    text-align: center;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 10px;
+}
+
+.theme-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
 /* Medieval font */
 @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
 
 .font-medieval, 
 .title,
-.session-label {
+.session-label,
+.ambience-title {
     font-family: 'MedievalSharp', cursive;
 }
 
@@ -42,23 +167,6 @@ body {
     color: #fbbf24;
     margin-bottom: 20px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.theme-selector {
-    margin-bottom: 15px;
-}
-
-.theme-title {
-    text-align: center;
-    color: #fbbf24;
-    margin-bottom: 10px;
-}
-
-.theme-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
 }
 
 .theme-button {
