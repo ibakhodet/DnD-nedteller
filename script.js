@@ -70,7 +70,7 @@ const audioIcon = document.getElementById('audioIcon');
 const volumeSlider = document.getElementById('volumeSlider');
 
 // Session date
-const SESSION_DATE = new Date('2025-03-25T18:00:00');
+let SESSION_DATE = new Date('2025-03-25T18:00:00');
 
 // Initialize the app
 function init() {
@@ -203,13 +203,21 @@ function updateCountdown() {
     const diff = SESSION_DATE - now;
     
     if (diff <= 0) {
-        document.getElementById('days').textContent = '0';
-        document.getElementById('hours').textContent = '0';
-        document.getElementById('minutes').textContent = '0';
-        document.getElementById('seconds').textContent = '0';
+        // Session time has passed
+        const hoursSinceSession = Math.floor((now - SESSION_DATE) / (1000 * 60 * 60));
+        
+        // Show celebration for 6 hours
+        if (hoursSinceSession < 6) {
+            // Show celebration screen
+            showCelebration();
+        } else {
+            // After 6 hours, show question marks
+            showQuestionMarks();
+        }
         return;
     }
     
+    // Normal countdown
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -222,6 +230,51 @@ function updateCountdown() {
     
     // Update progress bar
     updateProgressBar();
+}
+
+// Show celebration screen
+function showCelebration() {
+    // Hide countdown grid
+    document.querySelector('.countdown-grid').style.display = 'none';
+    
+    // Add celebration if it doesn't exist
+    if (!document.querySelector('.celebration')) {
+        const celebrationDiv = document.createElement('div');
+        celebrationDiv.className = 'celebration';
+        celebrationDiv.innerHTML = `
+            <div class="celebration-text">NU EDDE DND!!!</div>
+            <div class="celebration-emoji">🥳</div>
+        `;
+        
+        // Insert after progress bar
+        const progressBar = document.querySelector('.progress-bar');
+        progressBar.insertAdjacentElement('afterend', celebrationDiv);
+    }
+}
+
+// Show question marks when waiting for next session
+function showQuestionMarks() {
+    // Make sure countdown grid is visible
+    document.querySelector('.countdown-grid').style.display = 'grid';
+    
+    // Remove celebration if it exists
+    const celebration = document.querySelector('.celebration');
+    if (celebration) {
+        celebration.remove();
+    }
+    
+    // Replace all countdown numbers with question marks
+    document.getElementById('days').textContent = '?';
+    document.getElementById('hours').textContent = '?';
+    document.getElementById('minutes').textContent = '?';
+    document.getElementById('seconds').textContent = '?';
+}
+
+// Set new session date
+function setNewSessionDate(newDate) {
+    SESSION_DATE = new Date(newDate);
+    // Remove question marks and restart countdown
+    updateCountdown();
 }
 
 // Update progress bar based on time remaining

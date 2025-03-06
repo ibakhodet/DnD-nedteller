@@ -362,3 +362,46 @@ body {
     color: #dbeafe;
     border-color: #1e40af;
 }
+/* Celebration styles */
+.celebration {
+    text-align: center;
+    margin: 20px 0 30px;
+    animation: pulse 2s infinite alternate;
+}
+
+.celebration-text {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 40px;
+    font-weight: bold;
+    color: #fef08a;
+    text-shadow: 0 0 10px #b45309, 0 0 20px #d97706;
+    margin-bottom: 10px;
+}
+
+.celebration-emoji {
+    font-size: 60px;
+    animation: bounce 1s infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Question mark styling */
+.countdown-grid.question-marks .countdown-value {
+    font-size: 32px;
+}
