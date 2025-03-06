@@ -1,22 +1,10 @@
-// Theme configurations
+// Theme configurations - alphabetically sorted
 const themes = {
-    'vaaralon': {
-        background: 'linear-gradient(to bottom right, #0f172a, #7f1d1d)',
-        icon: '🗡️',
-        color: '#991b1b',
-        floatingItems: ['🗡️', '🏹', '💰', '🔍']
-    },
     'aktlaus': {
         background: 'linear-gradient(to bottom, #451a03, #854d0e)',
         icon: '🧘',
         color: '#ca8a04',
         floatingItems: ['🧘', '👊', '🕷️', '📿']
-    },
-    'vilde': {
-        background: 'linear-gradient(to right, #312e81, #5b21b6)',
-        icon: '🐉',
-        color: '#4f46e5',
-        floatingItems: ['🎲', '😈', '📚', '🐉']
     },
     'cassy': {
         background: 'linear-gradient(to bottom right, #27272a, #854d0e)',
@@ -35,6 +23,18 @@ const themes = {
         icon: '🌊',
         color: '#0891b2',
         floatingItems: ['✨', '🌊', '⚓', '🧜‍♂️']
+    },
+    'vaaralon': {
+        background: 'linear-gradient(to bottom right, #0f172a, #7f1d1d)',
+        icon: '🗡️',
+        color: '#991b1b',
+        floatingItems: ['🗡️', '🏹', '💰', '🔍']
+    },
+    'vilde': {
+        background: 'linear-gradient(to right, #312e81, #5b21b6)',
+        icon: '🐉',
+        color: '#4f46e5',
+        floatingItems: ['🎲', '😈', '📚', '🐉']
     }
 };
 
@@ -74,8 +74,17 @@ const SESSION_DATE = new Date('2025-03-25T18:00:00');
 
 // Initialize the app
 function init() {
-    // Set default theme (Vaaralon)
-    switchTheme('vaaralon', document.querySelector('.vaaralon-theme'));
+    // Set random theme
+    const themeNames = Object.keys(themes);
+    const randomThemeName = themeNames[Math.floor(Math.random() * themeNames.length)];
+    const themeButton = document.querySelector(`.${randomThemeName}-theme`);
+    
+    if (themeButton) {
+        switchTheme(randomThemeName, themeButton);
+    } else {
+        // Fallback to first theme if button not found
+        switchTheme(themeNames[0], document.querySelector(`.${themeNames[0]}-theme`));
+    }
     
     // Initialize countdown
     updateCountdown();
