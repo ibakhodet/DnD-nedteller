@@ -191,22 +191,22 @@ function renderSetupRow(c, i) {
     let hpBit = '';
     if (settings.trackHp) {
         if (c.maxHp == null) {
-            hpBit = `<span class="c-hp placeholder" onclick="startEditHp('${c.id}', this)">— HP</span>`;
+            hpBit = `<span class="c-hp placeholder" data-action="edit-hp">— HP</span>`;
         } else {
             const cur = c.hp ?? c.maxHp;
-            hpBit = `<span class="c-hp" onclick="startEditHp('${c.id}', this)">${cur}/${c.maxHp}</span>`;
+            hpBit = `<span class="c-hp" data-action="edit-hp">${cur}/${c.maxHp}</span>`;
         }
     }
 
     return `
         <div class="combatant-item" data-id="${c.id}">
             <span class="c-init">${c.initiative}</span>
-            <span class="c-name editable" onclick="startEditName('${c.id}', this)">${esc(c.name)}</span>
+            <span class="c-name editable" data-action="edit-name">${esc(c.name)}</span>
             <span class="type-badge ${c.type}">${c.type}</span>
             ${hpBit}
-            <button class="reorder-btn" tabindex="-1" onclick="moveCombatant('${c.id}', -1)" ${!sameInitAbove ? 'disabled' : ''} aria-label="Move up (only among same initiative)">▲</button>
-            <button class="reorder-btn" tabindex="-1" onclick="moveCombatant('${c.id}', 1)" ${!sameInitBelow ? 'disabled' : ''} aria-label="Move down (only among same initiative)">▼</button>
-            <button class="remove-btn" onclick="removeCombatant('${c.id}')" aria-label="Remove">✕</button>
+            <button class="reorder-btn" tabindex="-1" data-action="move" data-dir="-1" ${!sameInitAbove ? 'disabled' : ''} aria-label="Move up (only among same initiative)">▲</button>
+            <button class="reorder-btn" tabindex="-1" data-action="move" data-dir="1" ${!sameInitBelow ? 'disabled' : ''} aria-label="Move down (only among same initiative)">▼</button>
+            <button class="remove-btn" data-action="remove" aria-label="Remove">✕</button>
         </div>
     `;
 }
@@ -452,7 +452,7 @@ function renderOrderRow(c, i, next, nextResult) {
     const isNext   = next && !isActive && combatants[nextResult.idx] === c;
 
     const skullBtn = (c.type === 'monster' || c.type === 'npc')
-        ? `<button class="skull-btn ${c.dead ? 'is-dead' : ''}" onclick="toggleDead('${c.id}')" aria-label="${c.dead ? 'Revive' : 'Mark as dead'}">☠</button>`
+        ? `<button class="skull-btn ${c.dead ? 'is-dead' : ''}" data-action="toggle-dead" aria-label="${c.dead ? 'Revive' : 'Mark as dead'}">☠</button>`
         : '';
     const pip = isActive
         ? '<span class="active-pip">▶ ACTIVE</span>'
@@ -467,16 +467,16 @@ function renderOrderRow(c, i, next, nextResult) {
     const drawer = isExpanded ? renderDrawer(c, sameInitAbove, sameInitBelow) : '';
 
     return `
-        <div class="order-item ${stateCls} ${isExpanded ? 'expanded' : ''}">
+        <div class="order-item ${stateCls} ${isExpanded ? 'expanded' : ''}" data-id="${c.id}">
             <div class="oi-main">
                 <span class="o-pos">${i + 1}.</span>
                 <span class="o-init">${c.initiative}</span>
-                <span class="o-name editable" onclick="startEditName('${c.id}', this)">${esc(c.name)}</span>
+                <span class="o-name editable" data-action="edit-name">${esc(c.name)}</span>
                 <span class="type-badge ${c.type}">${c.type}</span>
                 ${hpInline}
                 ${skullBtn}
                 ${pip}
-                <button class="expand-btn ${isExpanded ? 'active' : ''}" onclick="toggleExpand('${c.id}')" aria-label="More options" aria-expanded="${isExpanded}">⋯</button>
+                <button class="expand-btn ${isExpanded ? 'active' : ''}" data-action="toggle-expand" aria-label="More options" aria-expanded="${isExpanded}">⋯</button>
             </div>
             ${conditionsInline}
             ${drawer}
@@ -486,7 +486,7 @@ function renderOrderRow(c, i, next, nextResult) {
 
 function renderHpInline(c) {
     if (c.maxHp == null) {
-        return `<button class="hp-set-btn" onclick="expandFor('${c.id}')">+ HP</button>`;
+        return `<button class="hp-set-btn" data-action="expand-for">+ HP</button>`;
     }
     const hp = c.hp ?? c.maxHp;
     const pct = c.maxHp > 0 ? Math.max(0, Math.min(100, (hp / c.maxHp) * 100)) : 0;
@@ -495,7 +495,7 @@ function renderHpInline(c) {
     else if (pct <= 25) hpCls = 'hp-crit';
     else if (pct <= 50) hpCls = 'hp-low';
     return `
-        <span class="o-hp ${hpCls}" onclick="expandFor('${c.id}')" role="button" aria-label="HP ${hp} of ${c.maxHp}">
+        <span class="o-hp ${hpCls}" data-action="expand-for" role="button" aria-label="HP ${hp} of ${c.maxHp}">
             <span class="hp-num">${hp}<span class="hp-sep">/</span>${c.maxHp}</span>
             <span class="hp-bar"><span class="hp-bar-fill" style="width:${pct}%"></span></span>
         </span>
@@ -510,7 +510,7 @@ function renderConditionsInline(c) {
                 const cond = CONDITION_MAP[k];
                 if (!cond) return '';
                 const icon = cond.icon ? cond.icon + ' ' : '';
-                return `<button class="cond-pill active" onclick="toggleCondition('${c.id}', '${k}')" aria-label="Remove ${cond.label}">${icon}${cond.label} <span class="cond-x">✕</span></button>`;
+                return `<button class="cond-pill active" data-action="toggle-condition" data-key="${k}" aria-label="Remove ${cond.label}">${icon}${cond.label} <span class="cond-x">✕</span></button>`;
             }).join('')}
         </div>
     `;
@@ -522,19 +522,14 @@ function renderDrawer(c, sameInitAbove, sameInitBelow) {
             <span class="drawer-label">HP</span>
             <div class="hp-controls">
                 <label class="mini-label">Max</label>
-                <input type="number" class="hp-max-input" value="${c.maxHp != null ? c.maxHp : ''}" placeholder="—" inputmode="numeric" min="1"
-                       onchange="setMaxHpFromInput('${c.id}', this)"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();setMaxHpFromInput('${c.id}', this);this.blur();}">
+                <input type="number" class="hp-max-input" data-action="set-max-hp" value="${c.maxHp != null ? c.maxHp : ''}" placeholder="—" inputmode="numeric" min="1">
                 ${c.maxHp != null ? `<label class="mini-label">Cur</label>
-                <input type="number" class="hp-cur-input" value="${c.hp ?? c.maxHp}" inputmode="numeric"
-                       onchange="setCurrentHp('${c.id}', this)"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();setCurrentHp('${c.id}', this);this.blur();}">` : ''}
+                <input type="number" class="hp-cur-input" data-action="set-cur-hp" value="${c.hp ?? c.maxHp}" inputmode="numeric">` : ''}
             </div>
             <div class="hp-controls">
-                <button class="hp-btn dmg" onclick="applyHp('${c.id}', this.parentElement.querySelector('.dmg-amount'), 'damage')">− Damage</button>
-                <input type="number" class="dmg-amount" placeholder="amount" inputmode="numeric" min="1"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();applyHp('${c.id}', this, 'damage');}">
-                <button class="hp-btn heal" onclick="applyHp('${c.id}', this.parentElement.querySelector('.dmg-amount'), 'heal')">+ Heal</button>
+                <button class="hp-btn dmg" data-action="hp-damage">− Damage</button>
+                <input type="number" class="dmg-amount" data-action="dmg-amount" placeholder="amount" inputmode="numeric" min="1">
+                <button class="hp-btn heal" data-action="hp-heal">+ Heal</button>
             </div>
         </div>
     ` : '';
@@ -546,7 +541,7 @@ function renderDrawer(c, sameInitAbove, sameInitBelow) {
                 ${CONDITIONS.map(cond => {
                     const on = c.conditions.includes(cond.key);
                     const icon = cond.icon ? cond.icon + ' ' : '';
-                    return `<button class="cond-pill ${on ? 'active' : ''}" onclick="toggleCondition('${c.id}', '${cond.key}')">${icon}${cond.label}</button>`;
+                    return `<button class="cond-pill ${on ? 'active' : ''}" data-action="toggle-condition" data-key="${cond.key}">${icon}${cond.label}</button>`;
                 }).join('')}
             </div>
         </div>
@@ -555,8 +550,8 @@ function renderDrawer(c, sameInitAbove, sameInitBelow) {
     const reorderSection = `
         <div class="drawer-section reorder-section">
             <span class="drawer-label">Order</span>
-            <button class="reorder-btn wide" tabindex="-1" onclick="moveCombatant('${c.id}', -1)" ${!sameInitAbove ? 'disabled' : ''}>▲ Up</button>
-            <button class="reorder-btn wide" tabindex="-1" onclick="moveCombatant('${c.id}', 1)" ${!sameInitBelow ? 'disabled' : ''}>▼ Down</button>
+            <button class="reorder-btn wide" tabindex="-1" data-action="move" data-dir="-1" ${!sameInitAbove ? 'disabled' : ''}>▲ Up</button>
+            <button class="reorder-btn wide" tabindex="-1" data-action="move" data-dir="1" ${!sameInitBelow ? 'disabled' : ''}>▼ Down</button>
             ${(!sameInitAbove && !sameInitBelow) ? '<span class="drawer-hint">Only moves among same initiative.</span>' : ''}
         </div>
     `;
@@ -707,8 +702,99 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => toggleTrackHp(!settings.trackHp));
     });
 
+    bindStaticHandlers();
+    bindDelegation();
     initMusicPlayer();
 });
+
+// ── Static button handlers (replaces inline onclick) ──────────────────────
+function bindStaticHandlers() {
+    document.getElementById('add-btn').addEventListener('click', addCombatant);
+    document.getElementById('start-btn').addEventListener('click', startEncounter);
+    document.getElementById('mc-submit-btn').addEventListener('click', submitMidCombat);
+    document.getElementById('next-btn').addEventListener('click', nextTurn);
+    document.getElementById('add-mid-btn').addEventListener('click', toggleMidCombat);
+    document.getElementById('end-btn').addEventListener('click', endEncounter);
+
+    document.querySelectorAll('.mp-theme').forEach(btn => {
+        btn.addEventListener('click', () => playTheme(btn.dataset.theme));
+    });
+    document.getElementById('mp-play').addEventListener('click', togglePlayPause);
+    document.getElementById('mp-next').addEventListener('click', nextTrack);
+    document.getElementById('mp-edit-btn').addEventListener('click', openMpEdit);
+
+    document.querySelectorAll('[data-action="close-mp-edit"]').forEach(el =>
+        el.addEventListener('click', closeMpEdit)
+    );
+    document.querySelector('[data-action="reset-mp-tracks"]').addEventListener('click', resetMpTracks);
+    document.querySelector('[data-action="save-mp-edit"]').addEventListener('click', saveMpEdit);
+}
+
+// ── Event delegation for dynamically rendered combatant rows ─────────────
+function bindDelegation() {
+    const listItems = document.getElementById('list-items');
+    const orderList = document.getElementById('order-list');
+    [listItems, orderList].forEach(root => {
+        root.addEventListener('click', handleDelegatedClick);
+        root.addEventListener('change', handleDelegatedChange);
+        root.addEventListener('keydown', handleDelegatedKeydown);
+    });
+}
+
+function findActionTarget(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return null;
+    const idEl = el.closest('[data-id]');
+    return { el, action: el.dataset.action, id: idEl ? idEl.dataset.id : null };
+}
+
+function handleDelegatedClick(e) {
+    const t = findActionTarget(e);
+    if (!t) return;
+    switch (t.action) {
+        case 'edit-name':       startEditName(t.id, t.el); break;
+        case 'edit-hp':         startEditHp(t.id, t.el); break;
+        case 'remove':          removeCombatant(t.id); break;
+        case 'move':            moveCombatant(t.id, parseInt(t.el.dataset.dir, 10)); break;
+        case 'toggle-dead':     toggleDead(t.id); break;
+        case 'toggle-expand':   toggleExpand(t.id); break;
+        case 'expand-for':      expandFor(t.id); break;
+        case 'toggle-condition': toggleCondition(t.id, t.el.dataset.key); break;
+        case 'hp-damage':       applyHp(t.id, t.el.parentElement.querySelector('.dmg-amount'), 'damage'); break;
+        case 'hp-heal':         applyHp(t.id, t.el.parentElement.querySelector('.dmg-amount'), 'heal'); break;
+    }
+}
+
+function handleDelegatedChange(e) {
+    const t = findActionTarget(e);
+    if (!t) return;
+    switch (t.action) {
+        case 'set-max-hp': setMaxHpFromInput(t.id, t.el); break;
+        case 'set-cur-hp': setCurrentHp(t.id, t.el); break;
+    }
+}
+
+function handleDelegatedKeydown(e) {
+    if (e.key !== 'Enter') return;
+    const t = findActionTarget(e);
+    if (!t) return;
+    switch (t.action) {
+        case 'set-max-hp':
+            e.preventDefault();
+            setMaxHpFromInput(t.id, t.el);
+            t.el.blur();
+            break;
+        case 'set-cur-hp':
+            e.preventDefault();
+            setCurrentHp(t.id, t.el);
+            t.el.blur();
+            break;
+        case 'dmg-amount':
+            e.preventDefault();
+            applyHp(t.id, t.el, 'damage');
+            break;
+    }
+}
 
 // ════════════════════════════════════
 //  Music Player
